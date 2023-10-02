@@ -22,17 +22,6 @@ $ call install/local_setup.bat
     $ ros2 run joystick_ros2 joystick_ros2
     ``` 
 
-## Supported joysticks
-Windows:
-
-    - All Xinput Controller
-
-Linux, Mac OSX:
-
-    - PS4 Controller
-    - Logitech F710
-    - Xbox One Controller
-
 ## Published Topics
 - joy ([sensor_msgs/Joy](https://github.com/ros2/common_interfaces/blob/master/sensor_msgs/msg/Joy.msg))
 
