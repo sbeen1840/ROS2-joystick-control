@@ -13,7 +13,7 @@ class JoystickRos2(Node):
         self.axis_states = {}
         self.button_states = {}
         self.threshold = 10000
-        self.divisions = [-32767, -self.threshold, 0, self.threshold, 32767]
+        self.division = [32767, self.threshold, 0, -self.threshold, -32767]
         self.axis_names = {
             0x00 : 'Left/Right Axis stick left',
             0x01 : 'Up/Down Axis stick left',
@@ -73,6 +73,7 @@ class JoystickRos2(Node):
         except IOError:
             self.get_logger().error(f'Error opening {self.fn}')
 
+
     def run(self):
         while rclpy.ok():
             try:
@@ -93,13 +94,23 @@ class JoystickRos2(Node):
                         axis = self.axis_map[number]
                         if axis:
                             cur_value = value
-                            for i in range(len(self.divisions) - 1):
-                                if self.divisions[i] <= cur_value <= self.divisions[i + 1]:
-                                    cur_state = i - 2
-                                    break
-                            else:
+                            cur_state = 0
+
+                            
+                            if cur_value >= self.division[0]:
+                                cur_state = -2
+                            elif self.division[0] > cur_value >= self.division[1]:
+                                cur_state = -1
+                            elif self.division[1] > cur_value >= self.division[2]:
                                 cur_state = 0
-                            self.axis_states[axis] = cur_state
+                            elif self.division[2] >= cur_value > self.division[3]:
+                                cur_state = 0
+                            elif self.division[3] >= cur_value > self.division[4]:
+                                cur_state = 1
+                            elif cur_value <= self.division[4]:
+                                cur_state = 2
+                            
+                            self.axis_states[axis] = float(cur_state)
                             self.get_logger().info("%s: %d" % (axis, cur_state))
                     joy_msg = Joy()
                     joy_msg.header.stamp = self.get_clock().now().to_msg()
